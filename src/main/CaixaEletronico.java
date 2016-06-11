@@ -1,5 +1,7 @@
 package main;
 
+import java.text.DecimalFormat;
+
 import interfaces.ServicoRemoto;
 
 public class CaixaEletronico {
@@ -24,15 +26,27 @@ public class CaixaEletronico {
 
 	public String saldo() {
 		ContaCorrente contaRetornada = _servico.recuperaConta(_conta);
-		return "O saldo é R$" + contaRetornada.getSaldo();
+		DecimalFormat valor = new DecimalFormat("0.00");
+		return "O saldo é R$" + valor.format(contaRetornada.getSaldo());
+	}
+		
+	public String depositar() {
+		ContaCorrente contaRetornada = _servico.recuperaConta(_conta);
+		contaRetornada.setValor(_conta.getValor());
+		{
+			_servico.persistirConta(contaRetornada);
+			return "Depósito recebido com sucesso";
+		}
 	}
 	
-	public String depositar() {
-		return "Depósito recebido com sucesso!";
-	}
-    
 	public String sacar() {
-		return "Saque realizado com sucesso!";
+		ContaCorrente contaRetornada = _servico.recuperaConta(_conta);
+		contaRetornada.setValor(_conta.getValor());
+		if(contaRetornada != null && contaRetornada.podeSacar()){
+			_servico.persistirConta(contaRetornada);
+			return "Retire seu dinheiro";
+		}
+		return "Saldo insuficiente";
 	}
 
 }

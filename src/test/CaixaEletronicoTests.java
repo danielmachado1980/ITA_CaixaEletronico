@@ -9,7 +9,7 @@ import main.ContaCorrente;
 import main.MockServicoRemoto;
 
 public class CaixaEletronicoTests {
-
+	
 	@Test
 	public void logarSucesso() {
 		ContaCorrente cc = new ContaCorrente(123, "senha");
@@ -34,24 +34,36 @@ public class CaixaEletronicoTests {
 		MockServicoRemoto mock = new MockServicoRemoto();
 		CaixaEletronico c = new CaixaEletronico(cc);
 		c.adicionaServico(mock);
-		assertEquals("O saldo é R$0.0", c.saldo());
+		assertEquals("O saldo é R$100,00", c.saldo());
 	}
-	
-	/*
-	@Test
-	public void sacarSucesso(){
-		CaixaEletronico c = new CaixaEletronico();
-		ContaCorrente cc = new ContaCorrente(123, "senha");
-		assertEquals("Saque realizado com sucesso!", c.sacar(cc));
-	}
-	
+			
 	@Test
 	public void depositarSucesso(){
-		CaixaEletronico c = new CaixaEletronico();
-		ContaCorrente cc = new ContaCorrente(123, "senha");
-		assertEquals("Depósito realizado com sucesso!", c.depositar(cc));
+		ContaCorrente cc = new ContaCorrente(123, "senha", 10.00);
+		MockServicoRemoto mock = new MockServicoRemoto();
+		CaixaEletronico c = new CaixaEletronico(cc);
+		c.adicionaServico(mock);
+		assertEquals("Depósito recebido com sucesso", c.depositar());
+		assertEquals("O saldo é R$110,00", c.saldo());
 	}
 	
 	
-	*/
+	@Test
+	public void sacarSucesso(){
+		ContaCorrente cc = new ContaCorrente(123, "senha", 100.00);
+		MockServicoRemoto mock = new MockServicoRemoto();
+		CaixaEletronico c = new CaixaEletronico(cc);
+		c.adicionaServico(mock);
+		assertEquals("Retire seu dinheiro", c.sacar());
+	}
+	
+	@Test
+	public void sacarInsucesso(){
+		ContaCorrente cc = new ContaCorrente(123, "senha", -101.00);
+		MockServicoRemoto mock = new MockServicoRemoto();
+		CaixaEletronico c = new CaixaEletronico(cc);
+		c.adicionaServico(mock);
+		assertEquals("Saldo insuficiente", c.sacar());
+	}
+	
 }
