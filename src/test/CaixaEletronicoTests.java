@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import main.CaixaEletronico;
 import main.ContaCorrente;
+import main.MockHardware;
 import main.MockServicoRemoto;
 
 public class CaixaEletronicoTests {
@@ -66,4 +67,14 @@ public class CaixaEletronicoTests {
 		assertEquals("Saldo insuficiente", c.sacar());
 	}
 	
+	@Test
+	public void logarComCartaoSucesso() {
+		MockServicoRemoto mockS = new MockServicoRemoto();
+		MockHardware mockH = new MockHardware();
+		ContaCorrente cc = new ContaCorrente("senha");
+		CaixaEletronico c = new CaixaEletronico(cc);
+		c.adicionaServico(mockS);
+		c.adicionaHardware(mockH);
+		assertEquals("Usuário autenticado", c.logar());
+	}
 }

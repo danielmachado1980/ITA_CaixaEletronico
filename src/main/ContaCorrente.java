@@ -19,8 +19,8 @@ public class ContaCorrente {
 		this.saldo += valor;
 	}
 	
-	public ContaCorrente(){
-		
+	public ContaCorrente(String senha) {
+		this.senha = senha;
 	}
 
 	public String getSenha() {
@@ -31,6 +31,10 @@ public class ContaCorrente {
 		return this.numero;
 	}
 
+	public void setNumero(int numero) {
+		this.numero = numero;
+	}
+
 	public double getSaldo() {
 		return this.saldo;
 	}
@@ -39,10 +43,6 @@ public class ContaCorrente {
 		this.saldo = saldo;
 	}
 	
-	public boolean podeSacar(){
-		return this.getSaldo() >= Math.abs(valor);
-	}
-
 	public double getValor() {
 		return this.valor;
 	}
@@ -50,4 +50,9 @@ public class ContaCorrente {
 	public void setValor(double valor) {
 		this.valor = valor;
 	}
+	
+	public boolean podeSacar(){
+		return this.getSaldo() >= Math.abs(valor);
+	}
+
 }
