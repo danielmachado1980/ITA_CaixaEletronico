@@ -24,12 +24,10 @@ public class CaixaEletronico {
 	}
 	
 	public String logar() {
-		if(_hardware != null){
-			try {
-				_conta.setNumero(Integer.parseInt(_hardware.pegarNumeroDaContaCartao()));
-			} catch (HardwareException e) {
-				return e.getMessage();
-			}
+		try {
+			lerNumeroCartao();
+		} catch (HardwareException e) {
+			return e.getMessage();
 		}
 		ContaCorrente contaRetornada = _servico.recuperaConta(_conta);
 		if(contaRetornada != null)
@@ -38,12 +36,10 @@ public class CaixaEletronico {
 	}
 
 	public String saldo() {
-		if(_hardware != null){
-			try {
-				_conta.setNumero(Integer.parseInt(_hardware.pegarNumeroDaContaCartao()));
-			} catch (HardwareException e) {
-				return e.getMessage();
-			}
+		try {
+			lerNumeroCartao();
+		} catch (HardwareException e) {
+			return e.getMessage();
 		}
 		ContaCorrente contaRetornada = _servico.recuperaConta(_conta);
 		if(contaRetornada != null){
@@ -56,23 +52,19 @@ public class CaixaEletronico {
 		
 	public String depositar() {
 		ContaCorrente contaRetornada;
-		if(_hardware != null){
-			try {
-				_conta.setNumero(Integer.parseInt(_hardware.pegarNumeroDaContaCartao()));
-			} catch (HardwareException e) {
-				return e.getMessage();
-			}
-			contaRetornada = _servico.recuperaConta(_conta);
-		}else
-			contaRetornada = _servico.recuperaConta(_conta);
+		try {
+			contaRetornada = retornarContaCadastrada();
+		} catch (HardwareException e) {
+			return e.getMessage();
+		}
 		if(contaRetornada != null){
 			contaRetornada.setValorMovimentado(_conta.getValorMovimentado());
 			_servico.persistirConta(contaRetornada);
 			if(_hardware != null)
 				try {
 					_hardware.lerEnvelope();
-				} catch (HardwareException e) {
-					return e.getMessage();
+				} catch (HardwareException ex) {
+					return ex.getMessage();
 				}
 			return "Depósito recebido com sucesso";
 		}
@@ -81,15 +73,11 @@ public class CaixaEletronico {
 	
 	public String sacar() {
 		ContaCorrente contaRetornada;
-		if(_hardware != null){
-			try {
-				_conta.setNumero(Integer.parseInt(_hardware.pegarNumeroDaContaCartao()));
-			} catch (HardwareException e) {
-				return e.getMessage();
-			}
-			contaRetornada = _servico.recuperaConta(_conta);
-		}else
-			contaRetornada = _servico.recuperaConta(_conta);
+		try {
+			contaRetornada = retornarContaCadastrada();
+		} catch (HardwareException e) {
+			return e.getMessage();
+		}
 		if(contaRetornada != null){
 			contaRetornada.setValorMovimentado(_conta.getValorMovimentado());
 			if(contaRetornada.podeSacar()){
@@ -97,8 +85,8 @@ public class CaixaEletronico {
 				if(_hardware != null)
 					try {
 						_hardware.entregarDinheiro();
-					} catch (HardwareException e) {
-						return e.getMessage();
+					} catch (HardwareException ex) {
+						return ex.getMessage();
 					}
 				return "Retire seu dinheiro";
 			}
@@ -106,5 +94,19 @@ public class CaixaEletronico {
 		}
 		return "Dados da conta inválidos";
 	}
-
+	
+	private ContaCorrente retornarContaCadastrada() throws HardwareException {
+		ContaCorrente contaRetornada;
+		if(_hardware != null){
+			_conta.setNumero(Integer.parseInt(_hardware.pegarNumeroDaContaCartao()));
+			contaRetornada = _servico.recuperaConta(_conta);
+		}else
+			contaRetornada = _servico.recuperaConta(_conta);
+		return contaRetornada;
+	}
+	
+	private void lerNumeroCartao() throws HardwareException {
+		if(_hardware != null)
+			_conta.setNumero(Integer.parseInt(_hardware.pegarNumeroDaContaCartao()));
+	}
 }
