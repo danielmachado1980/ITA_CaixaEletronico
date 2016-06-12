@@ -1,9 +1,10 @@
-package main;
+package test;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import interfaces.ServicoRemoto;
+import main.ContaCorrente;
 
 public class MockServicoRemoto implements ServicoRemoto{
 	
@@ -25,7 +26,7 @@ public class MockServicoRemoto implements ServicoRemoto{
 	public void persistirConta(ContaCorrente _conta) {
 		for(ContaCorrente conta : _lstcontacorrente)
 			if(conta.getNumero() == _conta.getNumero() && conta.getSenha() == _conta.getSenha())
-				conta.setSaldo(conta.getSaldo() + _conta.getValor());
+				conta.setSaldo(conta.getSaldo() + _conta.getValorMovimentado());
 	}
 	
 	private void inicilizarValores(){

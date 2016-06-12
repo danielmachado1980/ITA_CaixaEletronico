@@ -25,7 +25,11 @@ public class CaixaEletronico {
 	
 	public String logar() {
 		if(_hardware != null){
-			_conta.setNumero(Integer.parseInt(_hardware.pegarNumeroDaContaCartao()));
+			try {
+				_conta.setNumero(Integer.parseInt(_hardware.pegarNumeroDaContaCartao()));
+			} catch (HardwareException e) {
+				return e.getMessage();
+			}
 		}
 		ContaCorrente contaRetornada = _servico.recuperaConta(_conta);
 		if(contaRetornada != null)
@@ -35,37 +39,72 @@ public class CaixaEletronico {
 
 	public String saldo() {
 		if(_hardware != null){
-			_conta.setNumero(Integer.parseInt(_hardware.pegarNumeroDaContaCartao()));
+			try {
+				_conta.setNumero(Integer.parseInt(_hardware.pegarNumeroDaContaCartao()));
+			} catch (HardwareException e) {
+				return e.getMessage();
+			}
 		}
 		ContaCorrente contaRetornada = _servico.recuperaConta(_conta);
-		DecimalFormat valor = new DecimalFormat("0.00");
-		return "O saldo é R$" + valor.format(contaRetornada.getSaldo());
+		if(contaRetornada != null){
+			DecimalFormat valor = new DecimalFormat("0.00");
+			return "O saldo é R$" + valor.format(contaRetornada.getSaldo());
+		}else
+			return "Dados da conta inválidos";
+		
 	}
 		
 	public String depositar() {
+		ContaCorrente contaRetornada;
 		if(_hardware != null){
-			_conta.setNumero(Integer.parseInt(_hardware.pegarNumeroDaContaCartao()));
-		}
-		ContaCorrente contaRetornada = _servico.recuperaConta(_conta);
-		contaRetornada.setValor(_conta.getValor());
-		{
+			try {
+				_conta.setNumero(Integer.parseInt(_hardware.pegarNumeroDaContaCartao()));
+			} catch (HardwareException e) {
+				return e.getMessage();
+			}
+			contaRetornada = _servico.recuperaConta(_conta);
+		}else
+			contaRetornada = _servico.recuperaConta(_conta);
+		if(contaRetornada != null){
+			contaRetornada.setValorMovimentado(_conta.getValorMovimentado());
 			_servico.persistirConta(contaRetornada);
+			if(_hardware != null)
+				try {
+					_hardware.lerEnvelope();
+				} catch (HardwareException e) {
+					return e.getMessage();
+				}
 			return "Depósito recebido com sucesso";
 		}
+		return "Dados da conta inválidos";
 	}
 	
 	public String sacar() {
+		ContaCorrente contaRetornada;
 		if(_hardware != null){
-			_conta.setNumero(Integer.parseInt(_hardware.pegarNumeroDaContaCartao()));
+			try {
+				_conta.setNumero(Integer.parseInt(_hardware.pegarNumeroDaContaCartao()));
+			} catch (HardwareException e) {
+				return e.getMessage();
+			}
+			contaRetornada = _servico.recuperaConta(_conta);
+		}else
+			contaRetornada = _servico.recuperaConta(_conta);
+		if(contaRetornada != null){
+			contaRetornada.setValorMovimentado(_conta.getValorMovimentado());
+			if(contaRetornada.podeSacar()){
+				_servico.persistirConta(contaRetornada);
+				if(_hardware != null)
+					try {
+						_hardware.entregarDinheiro();
+					} catch (HardwareException e) {
+						return e.getMessage();
+					}
+				return "Retire seu dinheiro";
+			}
+			return "Saldo insuficiente";
 		}
-		ContaCorrente contaRetornada = _servico.recuperaConta(_conta);
-		contaRetornada.setValor(_conta.getValor());
-		if(contaRetornada != null && contaRetornada.podeSacar()){
-			_hardware.entregarDinheiro();
-			_servico.persistirConta(contaRetornada);
-			return "Retire seu dinheiro";
-		}
-		return "Saldo insuficiente";
+		return "Dados da conta inválidos";
 	}
 
 }

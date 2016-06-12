@@ -5,7 +5,7 @@ public class ContaCorrente {
 	private int numero;
 	private String senha;
 	private double saldo;
-	private double valor;
+	private double valorMovimentado;
 	
 	public ContaCorrente(int numero, String senha) {
 		this.numero = numero;
@@ -15,12 +15,17 @@ public class ContaCorrente {
 	public ContaCorrente(int numero, String senha, double valor) {
 		this.numero = numero;
 		this.senha = senha;
-		this.valor = valor;
+		this.valorMovimentado = valor;
 		this.saldo += valor;
 	}
 	
 	public ContaCorrente(String senha) {
 		this.senha = senha;
+	}
+
+	public ContaCorrente(String senha, double valor) {
+		this.senha = senha;
+		this.valorMovimentado = valor;
 	}
 
 	public String getSenha() {
@@ -43,16 +48,16 @@ public class ContaCorrente {
 		this.saldo = saldo;
 	}
 	
-	public double getValor() {
-		return this.valor;
+	public double getValorMovimentado() {
+		return this.valorMovimentado;
 	}
 	
-	public void setValor(double valor) {
-		this.valor = valor;
+	public void setValorMovimentado(double valor) {
+		this.valorMovimentado = valor;
 	}
 	
 	public boolean podeSacar(){
-		return this.getSaldo() >= Math.abs(valor);
+		return this.getSaldo() >= Math.abs(valorMovimentado);
 	}
 
 }
